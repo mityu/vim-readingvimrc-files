@@ -1,0 +1,154 @@
+*readingvimrc-files.txt*	vimrc読書会で読まれるファイル一覧とファイル閲覧
+
+Author: mityu
+License: MIT lisence
+Inspired by rbtnn/vim-readingvimrc
+
+==============================================================================
+目次						*readingvimrc-files-contents*
+
+概要				|readingvimrc-files-introduction|
+コマンド			|readingvimrc-files-commands|
+関数				|readingvimrc-files-functions|
+キーマッピング			|readingvimrc-files-key-mappings|
+設定				|readingvimrc-files-config|
+  変数				  |readingvimrc-files-variables|
+  自動コマンド			  |readingvimrc-files-autocmd-events|
+設定例				|readingvimrc-files-example|
+
+
+
+==============================================================================
+概要					*readingvimrc-files-introduction*
+
+vimrc読書会(https://vim-jp.org/reading-vimrc/)で読まれるファイルの一覧を表示、
+及びファイルの閲覧ができます。
+
+
+==============================================================================
+コマンド				*readingvimrc-files-commands*
+
+:ReadingVimrcFiles			*:ReadingVimrcFiles*
+	vimrc読書会で読まれるファイルの一覧を取得し、表示します。
+
+
+==============================================================================
+関数					*readingvimrc-files-functions*
+
+readingvimrc_files#start()		*readingvimrc_files#start()*
+	|:ReadingVimrcFiles| の関数版です。
+
+
+==============================================================================
+キーマッピング				*readingvimrc-files-key-mappings*
+
+NOTE: 以下の全てのマッピングはバッファローカルなマッピングとして提供されます。
+
+<Plug>(readingvimrc-files-view-file)	*<Plug>(readingvimrc-files-view-file)*
+	ファイルを閲覧します。このキーマッピングはファイル一覧ウインドウでのみ
+	有効です。
+
+<Plug>(readingvimrc-files-quit)		*<Plug>(readingvimrc-files-quit)*
+	ウインドウを閉じます。このキーマッピングはファイル一覧ウインドウ、ファ
+	イル閲覧ウインドウのどちらでも有効です。
+
+				*readingvimrc-files-default-key-mappings*
+以下のデフォルトのキーマッピングは既に定義されているとき、もしくは
+|g:readingvimrc_files_no_default_key_mappings| が真の値に設定されているときは定
+義されません。
+
+ファイル一覧ウインドウ
+{lhs}     {rhs}
+-----     ------------------------------------
+<CR>      <Plug>(readingvimrc-files-view-file)
+q         <Plug>(readingvimrc-files-quit)
+
+ファイル閲覧ウインドウ
+{lhs}     {rhs}
+-----     ------------------------------------
+q         <Plug>(readingvimrc-files-quit)
+
+
+==============================================================================
+設定					*readingvimrc-files-config*
+
+------------------------------------------------------------------------------
+変数					*readingvimrc-files-variables*
+
+				*g:readingvimrc_files_no_default_key_mappings*
+g:readingvimrc_files_no_default_key_mappings
+	既定値：0
+
+	値が真の場合、デフォルトのマッピングは定義されません。
+	See Also: |readingvimrc-files-default-key-mappings|
+
+			*g:readingvimrc_files_listing_window_open_command*
+g:readingvimrc_files_listing_window_open_command
+	既定値：'topleft split'
+
+	ファイル一覧ウインドウを開く時に使用されるコマンドです。
+
+			*g:readingvimrc_files_viewing_window_open_command*
+g:readingvimrc_files_viewing_window_open_command
+	既定値：'belowright split'
+
+	ファイルを開く時に使用されるコマンドです。
+
+			*g:readingvimrc_files_auto_expand_viewing_window*
+g:readingvimrc_files_auto_expand_viewing_window
+	既定値：1
+
+	値が真の時、ファイルを開いた時に自動で可能な限りウインドウのサイズを
+	大きくします。
+
+			*g:readingvimrc_files_auto_resize_listing_window*
+g:readingvimrc_files_auto_resize_listing_window
+	既定値：1
+
+	値が真の時、ファイル一覧ウインドウに戻った時に自動でウインドウの縦幅を
+	調整します。
+
+
+------------------------------------------------------------------------------
+自動コマンド			*readingvimrc-files-autocmd-events*
+
+User ReadingVimrcFilesOpenList	*User-ReadingVimrcFilesOpenList*
+FileType readingvimrc_files	*FileType-readingvimrc_files*
+
+	ファイル一覧ウインドウを開いた時に発生する自動コマンドです。
+
+User ReadingVimrcFilesOpenFile	*User-ReadingVimrcFilesOpenFile*
+
+	ファイルを開いた時に発生する自動コマンドです。
+
+
+==============================================================================
+設定例				*readingvimrc-files-example*
+
+>
+	" ファイル一覧ウインドウを新規タブで開くようにします。
+	let g:readingvimrc_files_listing_window_open_command = 'tabedit'
+
+	" ファイルを垂直分割で開くようにします。
+	let g:readingvimrc_files_viewing_window_open_command = 'vsplit'
+
+	" デフォルトのマッピングを無効化し、独自のマッピングを使用します。
+	let g:readingvimrc_files_no_default_key_mappings = 1
+	function! s:on_ReadingVimrcFilesOpenList()
+		nmap <buffer> o <Plug>(readingvimrc-files-view-file)
+		nmap <buffer> <Leader>c <Plug>(readingvimrc-files-quit)
+	endfunction
+	function! s:on_ReadingVimrcFilesOpenFile()
+		nmap <buffer> <Leader>c <Plug>(readingvimrc-files-quit)
+	endfunction
+	augroup MyReadingVimrcFiles
+		autocmd!
+		autocmd User ReadingVimrcFilesOpenList
+			\ call s:on_ReadingVimrcFilesOpenList()
+		autocmd User ReadingVimrcFilesOpenFile
+			\ call s:on_ReadingVimrcFilesOpenFile()
+	augroup END
+
+
+==============================================================================
+vim:tw=78:fo=tcq2mM:ts=8:ft=help:norl:nosta:noet
